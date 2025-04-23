@@ -8,6 +8,7 @@
 #include <map>
 #include "PatternTemplates.h"
 #include <list>
+using namespace std;
 
 enum class OrganizationBelonging : int
 {
@@ -16,6 +17,8 @@ enum class OrganizationBelonging : int
 
     Undefined = 0
 };
+
+
 
 using namespace std;
 class Person{
@@ -27,6 +30,15 @@ public:
         Name(name), Age(age), Experience(experience){}
 
     Person();
+
+    bool Equals(Person client2)
+    {
+        if (this->Age == client2.Age && this->Experience == client2.Experience &&
+            this->Name == client2.Name)
+                return true;
+        else return false;
+    }
+
 
 };
 class FinancialAndCreditOrganization{ //Финансово-кредитные организации
@@ -48,6 +60,19 @@ public:
     OrganizationBelonging GetBelong()
     {
         return Belong;
+    }
+    void CloseAccont()
+    {
+        Account = 0;
+    }
+    void AddAccont()
+    {
+        Account = 100;
+    }
+    void AddAccont(Person client)
+    {
+        Client = client;
+        Account = 100;
     }
     Person Client; //fields
     string Name;
@@ -96,6 +121,7 @@ public:
         }
         return person.Name + " Не принят на работу";
     }
+
 private:
     Person Client; //fields
     double Account;
@@ -206,6 +232,99 @@ private:
     string OsagoNumber;
 
 };
+
+enum class ActionsWithAccount : int
+{
+  AddMoney = 1,
+  GetMoney = 2,
+  CloseAccount = 3,
+
+
+  AddAccount = 4,
+
+  None = 0
+};
+//стратегия
+class AccountStrategy
+{
+public:
+  virtual ~AccountStrategy() {}
+  virtual void ActionWithAccount(FinancialAndCreditOrganization org, Person client) = 0;
+};
+
+class AddMoneyStrategy : public AccountStrategy
+{
+  void ActionWithAccount(FinancialAndCreditOrganization org, Person client)
+  {
+      if (org.Client.Equals(client))
+        {
+            //cout << org.SetMoney(client, 100);
+            cout << client.Name + " пополняет счет на 100р" << endl;
+        }
+      else cout << "Клиент не найден. Откройте счет" << endl;
+  }
+
+};
+
+class GetMoneyStrategy : public AccountStrategy
+{
+  void ActionWithAccount(FinancialAndCreditOrganization org, Person client)
+  {
+      if (org.Client.Equals(client))
+        {
+            //cout << org.GetMoney(client, 100);
+            cout << client.Name + " снимает со счета 100р" << endl;
+        }
+      else cout << "Клиент не найден. Откройте счет" << endl;
+  }
+};
+
+class AddAccount : public AccountStrategy
+{
+  void ActionWithAccount(FinancialAndCreditOrganization org, Person client)
+  {
+      if (org.Client.Equals(client))
+        {
+            org.AddAccont();
+            cout << "счет " + client.Name + " открыт. 100р в подарок за открытие." << endl;
+        }
+      else{
+            org.AddAccont(client);
+            cout << "Клиент не найден. Откройте счет" << endl;
+      }
+  }
+};
+
+class CloseAccount : public AccountStrategy
+{
+  void ActionWithAccount(FinancialAndCreditOrganization org, Person client)
+  {
+      if (org.Client.Equals(client))
+        {
+            org.CloseAccont();
+            cout << "счет " + client.Name + " закрыт" << endl;
+        }
+      else cout << "Клиент не найден. Откройте счет" << endl;
+  }
+};
+
+// Фабричный метод для создания стратегий
+AccountStrategy *CreateAccountStrategy(ActionsWithAccount actions)
+{
+  switch(actions)
+  {
+    case ActionsWithAccount::AddMoney: return new AddMoneyStrategy;
+    case ActionsWithAccount::GetMoney: return new GetMoneyStrategy;
+    case ActionsWithAccount::AddAccount: return new AddAccount;
+
+    // Новый способ (для варианта 2)
+    case ActionsWithAccount::CloseAccount: return new CloseAccount;
+
+    default: return nullptr;
+  }
+}
+
+
 enum class FinancialAndCreditOrganizationType : int
 {
     Bank = 1,
@@ -428,6 +547,16 @@ int main()
     new OrganizationPriceDecorator(new OrganizationBelongingDecorator(adaptedIt, OrganizationBelonging::Private), 300);
     GetOneRuble(adaptedPrivateIt, mike);
     delete adaptedPrivateIt;
+
+    cout << endl << endl << "Демонстрация работы стратегии" << endl;
+    //Демонстрация работы стратегии
+    for(int i=0; i<10; i++)
+    {
+        int action_num = rand()%4+1; // Число от 1 до 4 (случайная организация)
+        ActionsWithAccount action = static_cast<ActionsWithAccount>(action_num);
+        AccountStrategy *acc_strat = CreateAccountStrategy(action);
+        acc_strat->ActionWithAccount(sber, mike);
+    }
 
     return 0;
 }

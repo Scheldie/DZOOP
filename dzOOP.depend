@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1743537039 source:c:\users\user\desktop\dzoop\main.cpp
+1745422140 source:c:\users\user\desktop\dzoop\main.cpp
 	<cstdio>
 	<iostream>
 	<string>
@@ -9,6 +9,7 @@
 	<cmath>
 	<map>
 	"PatternTemplates.h"
+	<list>
 
 1743533785 c:\users\user\desktop\dzoop\patterntemplates.h
 
