@@ -8,7 +8,13 @@
 #include <map>
 #include "PatternTemplates.h"
 #include <list>
+#include "file.h"
+#include <cryptopp/aes.h>
+#include <cryptopp/modes.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
 using namespace std;
+using namespace CryptoPP;
 
 enum class OrganizationBelonging : int
 {
@@ -557,6 +563,24 @@ int main()
         AccountStrategy *acc_strat = CreateAccountStrategy(action);
         acc_strat->ActionWithAccount(sber, mike);
     }
+    cout << endl;
+    cout << endl;
+    // Ключ (32 байта для AES-256) и IV (16 байт)
+    std::string key = "0123456789abcdef0123456789abcdef"; // 32 символа
+    std::string iv = "abcdefghijklmnop";                  // 16 символов
 
+    std::string plaintext = "Hello, Crypto++!";
+    std::string ciphertext = encryptAES(plaintext, key, iv);
+    std::string decrypted = decryptAES(ciphertext, key, iv);
+
+    std::cout << "Исходный текст: " << plaintext << std::endl;
+    std::cout << "Зашифрованный (HEX): ";
+    
+    
+    std::cout << std::endl << "Расшифрованный: " << decrypted << std::endl;
+    
+
+    system("pause");
+    
     return 0;
 }
